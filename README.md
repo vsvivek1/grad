@@ -28,3 +28,7 @@ npm run build
 ```
 
 The original PHP app is kept in `legacy-php/` for reference.
+
+## Password
+
+Set the `SITE_PASSWORD` environment variable in Vercel to put the whole site behind a shared password (any username works). Leave it unset for an open site.
