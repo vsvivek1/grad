@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { logClientActivity } from "./actions";
 import {
   DEFAULT_POSTS,
   DEFAULT_RETIREMENT_AGE,
@@ -17,17 +18,45 @@ import {
 
 type Tab = "date" | "person";
 
-export default function Gradation({ people }: { people: Person[] }) {
+type Track = (action: string, detail: Record<string, string | number | null>) => void;
+
+/** Calls `fn` once `value` has stopped changing for `ms`, skipping the first render. */
+function useSettled<T>(value: T, ms: number, fn: (v: T) => void) {
+  const first = useRef(true);
+  const cb = useRef(fn);
+  cb.current = fn;
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    const t = setTimeout(() => cb.current(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+}
+
+export default function Gradation({ people, track: tracking = false }: { people: Person[]; track?: boolean }) {
+  const track: Track = (action, detail) => {
+    if (tracking) logClientActivity(action, detail).catch(() => {});
+  };
   const [tab, setTab] = useState<Tab>("date");
   const [selected, setSelected] = useState<number | null>(null);
-  const openPerson = (slno: number) => {
+  const select = (slno: number | null) => {
     setSelected(slno);
+    const p = slno === null ? undefined : people.find((e) => e.slno === slno);
+    if (p) track("view_person", { slno: p.slno, name: p.name });
+  };
+  const openPerson = (slno: number) => {
+    select(slno);
     setTab("person");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const [posts, setPosts] = useState<Post[]>(DEFAULT_POSTS);
   const [age, setAge] = useState(DEFAULT_RETIREMENT_AGE);
   const all = useMemo(() => employees(people, age), [people, age]);
+  useSettled(JSON.stringify([posts.map((p) => p.count), age]), 2000, () =>
+    track("change_settings", { ...Object.fromEntries(posts.map((p) => [p.code, p.count])), retirementAge: age }),
+  );
 
   return (
     <>
@@ -67,18 +96,30 @@ export default function Gradation({ people }: { people: Person[] }) {
 
       {/* Both stay mounted so the date view keeps its filters when you come back. */}
       <div hidden={tab !== "date"}>
-        <ByDate all={all} posts={posts} onOpen={openPerson} />
+        <ByDate all={all} posts={posts} onOpen={openPerson} track={track} />
       </div>
       <div hidden={tab !== "person"}>
-        <ByPerson all={all} posts={posts} selected={selected} onSelect={setSelected} onBack={() => setTab("date")} />
+        <ByPerson all={all} posts={posts} selected={selected} onSelect={select} onBack={() => setTab("date")} />
       </div>
     </>
   );
 }
 
-function ByDate({ all, posts, onOpen }: { all: ReturnType<typeof employees>; posts: Post[]; onOpen: (slno: number) => void }) {
+function ByDate({
+  all,
+  posts,
+  onOpen,
+  track,
+}: {
+  all: ReturnType<typeof employees>;
+  posts: Post[];
+  onOpen: (slno: number) => void;
+  track: Track;
+}) {
   const [date, setDate] = useState(today());
   const [query, setQuery] = useState("");
+  useSettled(date, 1500, (d) => d && track("change_date", { date: d }));
+  useSettled(query.trim(), 1500, (q) => q.length >= 3 && track("search", { query: q }));
   const [only, setOnly] = useState<number | null>(null);
   const rows = useMemo(() => (date ? snapshot(all, date, posts) : []), [all, date, posts]);
 
@@ -133,7 +174,13 @@ function ByDate({ all, posts, onOpen }: { all: ReturnType<typeof employees>; pos
                 <td>{r.rank}</td>
                 <td>{r.slno}</td>
                 <td>
-                  <button className="link" onClick={() => onOpen(r.slno)}>
+                  <button
+                    className="link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpen(r.slno);
+                    }}
+                  >
                     {r.name}
                   </button>
                 </td>

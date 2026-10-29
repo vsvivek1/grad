@@ -112,3 +112,6 @@ tr.clickable:hover td { background: color-mix(in srgb, var(--accent) 6%, transpa
 .signin form { margin-top: 18px; }
 button.google { width: 100%; padding: 10px 14px; font-weight: 600; background: var(--accent); border-color: var(--accent); color: #fff; }
 .error { color: var(--p0); }
+a { color: var(--accent); }
+.small { font-size: 12px; }
+.topbar h2 { margin: 0; }

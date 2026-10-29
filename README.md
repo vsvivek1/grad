@@ -39,3 +39,10 @@ The site asks visitors to sign in with Google once these environment variables a
 - `ALLOWED_EMAILS` (optional): comma-separated emails allowed in. Leave it empty to let any Google account in.
 
 Without `AUTH_GOOGLE_ID` the site is open.
+
+## Admin and activity log
+
+Signed-in activity (sign in/out, opening the app, people viewed, dates and searches, post-count changes) is logged to a Supabase table. Admins see it at `/admin`.
+
+- `ADMIN_EMAILS`: comma-separated emails that can open `/admin`
+- `SUPABASE_URL`, `SUPABASE_KEY` (publishable key), `SUPABASE_LOG_TOKEN`: the log table is closed to direct access; the server calls the `log_activity`, `read_activity` and `activity_users` functions, which check the token stored in `private.app_token`. See `supabase/activity_log.sql`.
