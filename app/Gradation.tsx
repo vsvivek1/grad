@@ -119,7 +119,7 @@ function ByDate({ all, posts, onOpen }: { all: ReturnType<typeof employees>; pos
         <table>
           <thead>
             <tr>
-              <th>Rank</th>
+              <th>Seniority position</th>
               <th>Sl No</th>
               <th>Name</th>
               <th>Born</th>
@@ -240,7 +240,7 @@ function ByPerson({
                 <th>Post</th>
                 <th>From</th>
                 <th>Until</th>
-                <th>Rank</th>
+                <th>Seniority position (start → end)</th>
               </tr>
             </thead>
             <tbody>
@@ -259,7 +259,7 @@ function ByPerson({
           </div>
           <p className="muted">
             {!me.serviceStart && "No joining date on record, so the timeline starts today. "}
-            Rank 1 is the senior-most engineer in service. The top {posts.reduce((a, p) => a + (p.count || 0), 0)} ranks hold
+            Seniority position 1 is the senior-most engineer in service. Positions 1 to {posts.reduce((a, p) => a + (p.count || 0), 0)} hold
             posts above {AE_LABEL}.
           </p>
         </>
