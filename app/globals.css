@@ -87,3 +87,21 @@ tr.current td { background: color-mix(in srgb, var(--accent) 10%, transparent); 
 .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 16px 0; }
 .facts div { display: flex; flex-direction: column; font-weight: 600; }
 .facts span { font-size: 12px; color: var(--muted); font-weight: 400; }
+button.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: var(--accent);
+  text-align: left;
+  font: inherit;
+}
+button.link:hover { text-decoration: underline; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.results { list-style: none; padding: 0; margin: 10px 0; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
+.results li { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.results li:last-child { border-bottom: 0; }
+.results .muted { font-size: 13px; margin-left: 6px; }
+.who { font-size: 18px; margin: 16px 0 0; }
+.card > .row:first-child { margin-bottom: 12px; }

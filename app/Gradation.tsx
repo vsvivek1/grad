@@ -19,6 +19,12 @@ type Tab = "date" | "person";
 
 export default function Gradation() {
   const [tab, setTab] = useState<Tab>("date");
+  const [selected, setSelected] = useState<number | null>(null);
+  const openPerson = (slno: number) => {
+    setSelected(slno);
+    setTab("person");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const [posts, setPosts] = useState<Post[]>(DEFAULT_POSTS);
   const [age, setAge] = useState(DEFAULT_RETIREMENT_AGE);
   const all = useMemo(() => employees(people, age), [age]);
@@ -59,12 +65,18 @@ export default function Gradation() {
         </button>
       </nav>
 
-      {tab === "date" ? <ByDate all={all} posts={posts} /> : <ByPerson all={all} posts={posts} />}
+      {/* Both stay mounted so the date view keeps its filters when you come back. */}
+      <div hidden={tab !== "date"}>
+        <ByDate all={all} posts={posts} onOpen={openPerson} />
+      </div>
+      <div hidden={tab !== "person"}>
+        <ByPerson all={all} posts={posts} selected={selected} onSelect={setSelected} onBack={() => setTab("date")} />
+      </div>
     </>
   );
 }
 
-function ByDate({ all, posts }: { all: ReturnType<typeof employees>; posts: Post[] }) {
+function ByDate({ all, posts, onOpen }: { all: ReturnType<typeof employees>; posts: Post[]; onOpen: (slno: number) => void }) {
   const [date, setDate] = useState(today());
   const [query, setQuery] = useState("");
   const [only, setOnly] = useState<number | null>(null);
@@ -117,10 +129,14 @@ function ByDate({ all, posts }: { all: ReturnType<typeof employees>; posts: Post
           </thead>
           <tbody>
             {shown.slice(0, 500).map((r) => (
-              <tr key={r.slno}>
+              <tr key={r.slno} className="clickable" onClick={() => onOpen(r.slno)} title="See this person's posts">
                 <td>{r.rank}</td>
                 <td>{r.slno}</td>
-                <td>{r.name}</td>
+                <td>
+                  <button className="link" onClick={() => onOpen(r.slno)}>
+                    {r.name}
+                  </button>
+                </td>
                 <td>{formatDate(r.dob)}</td>
                 <td>{formatDate(r.retire)}</td>
                 <td>
@@ -137,29 +153,59 @@ function ByDate({ all, posts }: { all: ReturnType<typeof employees>; posts: Post
   );
 }
 
-function ByPerson({ all, posts }: { all: ReturnType<typeof employees>; posts: Post[] }) {
-  const options = useMemo(() => all.filter((e) => e.retire).map((e) => ({ slno: e.slno, text: `${e.name} (#${e.slno})` })), [all]);
-  const [text, setText] = useState("");
-  const match = options.find((o) => o.text === text) ?? options.find((o) => String(o.slno) === text.trim());
-  const me = match ? all.find((e) => e.slno === match.slno) : undefined;
+function ByPerson({
+  all,
+  posts,
+  selected,
+  onSelect,
+  onBack,
+}: {
+  all: ReturnType<typeof employees>;
+  posts: Post[];
+  selected: number | null;
+  onSelect: (slno: number | null) => void;
+  onBack: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const me = selected === null ? undefined : all.find((e) => e.slno === selected);
   const segments = useMemo(() => (me ? timeline(all, me.slno, posts) : []), [all, me, posts]);
   const now = today();
   const current = segments.find((s) => s.from <= now && s.to >= now);
 
+  const q = query.trim().toLowerCase();
+  const results = q ? all.filter((e) => e.retire && (e.name.toLowerCase().includes(q) || String(e.slno) === q)).slice(0, 30) : [];
+
   return (
     <section className="card">
+      <div className="row">
+        <button onClick={onBack}>← Back to date view</button>
+      </div>
       <label>
-        Name or Sl No
-        <input list="people" value={text} onChange={(e) => setText(e.target.value)} placeholder="Start typing a name…" />
-        <datalist id="people">
-          {options.map((o) => (
-            <option key={o.slno} value={o.text} />
-          ))}
-        </datalist>
+        Search name or Sl No
+        <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Start typing a name…" />
       </label>
+      {q && (
+        <ul className="results">
+          {results.map((e) => (
+            <li key={e.slno}>
+              <button
+                className={`link ${e.slno === selected ? "on" : ""}`}
+                onClick={() => {
+                  onSelect(e.slno);
+                  setQuery("");
+                }}
+              >
+                {e.name} <span className="muted">#{e.slno} · born {formatDate(e.dob)}</span>
+              </button>
+            </li>
+          ))}
+          {results.length === 0 && <li className="muted">Nobody matches.</li>}
+        </ul>
+      )}
 
       {me && (
         <>
+          <h2 className="who">{me.name}</h2>
           <div className="facts">
             <div>
               <span>Sl No</span>
@@ -187,6 +233,7 @@ function ByPerson({ all, posts }: { all: ReturnType<typeof employees>; posts: Po
             </div>
           </div>
 
+          <div className="tablewrap">
           <table>
             <thead>
               <tr>
@@ -209,6 +256,7 @@ function ByPerson({ all, posts }: { all: ReturnType<typeof employees>; posts: Po
               ))}
             </tbody>
           </table>
+          </div>
           <p className="muted">
             {!me.serviceStart && "No joining date on record, so the timeline starts today. "}
             Rank 1 is the senior-most engineer in service. The top {posts.reduce((a, p) => a + (p.count || 0), 0)} ranks hold
@@ -216,7 +264,7 @@ function ByPerson({ all, posts }: { all: ReturnType<typeof employees>; posts: Po
           </p>
         </>
       )}
-      {!me && text && <p className="muted">Pick a name from the list.</p>}
+      {!me && !q && <p className="muted">Search for a name, or click a name in the date view.</p>}
     </section>
   );
 }
