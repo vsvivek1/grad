@@ -46,8 +46,10 @@ export default async function Page() {
         outOfService={outOfService}
       />
       <footer className="foot">
-        Projection only. Assumes promotion strictly by gradation list order and retirement at the end of the month
-        the retirement age is reached. Engineers with no date of birth on record are left out.
+        <strong>Disclaimer.</strong> This is an approximation only, not an official order or ranking. It is based on the
+        available PSC advice and the gradation list data on record. It assumes promotions follow list order, retirement at
+        the end of the month the retirement age is reached, and the post counts set above. Engineers with no date of birth
+        on record are left out. Confirm any decision with the official KSEB and PSC records.
       </footer>
     </main>
   );
