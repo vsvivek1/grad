@@ -81,3 +81,11 @@ export function readActivity(email: string | null, limit = 500) {
 export function activityUsers() {
   return rpc<ActivityUser[]>("activity_users", {});
 }
+
+export function listServiceStatus() {
+  return rpc<{ slno: number; out_of_service: boolean }[]>("list_service_status", {});
+}
+
+export function setServiceStatus(slno: number, out: boolean, user: { email: string; name?: string | null }) {
+  return rpc<null>("set_service_status", { p_slno: slno, p_out: out, p_email: user.email, p_name: user.name ?? null });
+}

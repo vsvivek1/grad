@@ -115,3 +115,11 @@ button.google { width: 100%; padding: 10px 14px; font-weight: 600; background: v
 a { color: var(--accent); }
 .small { font-size: 12px; }
 .topbar h2 { margin: 0; }
+tr.out td { color: var(--muted); background: color-mix(in srgb, var(--muted) 7%, transparent); }
+.tag.out-tag { --c: var(--muted); }
+button.action { font-size: 12px; padding: 4px 10px; white-space: nowrap; }
+button.action:disabled { opacity: 0.5; cursor: not-allowed; }
+.who-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.who.out { color: var(--muted); }
+.notice { background: color-mix(in srgb, var(--muted) 12%, transparent); padding: 8px 10px; border-radius: 8px; font-size: 14px; }
+button.link.out { color: var(--muted); }

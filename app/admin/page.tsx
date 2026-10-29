@@ -14,6 +14,8 @@ const ACTION_LABELS: Record<string, string> = {
   change_date: "Changed date",
   change_settings: "Changed post counts",
   search: "Searched",
+  mark_not_in_service: "Marked not in service",
+  mark_in_service: "Restored to service",
 };
 
 const IST = "Asia/Kolkata";
@@ -26,6 +28,9 @@ function describe(row: ActivityRow): string {
   switch (row.action) {
     case "view_person":
       return `${d.name ?? ""} (#${d.slno ?? "?"})`;
+    case "mark_not_in_service":
+    case "mark_in_service":
+      return `Sl No ${d.slno ?? "?"}`;
     case "change_date":
       return String(d.date ?? "");
     case "search":

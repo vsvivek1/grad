@@ -7,17 +7,17 @@ export type Person = {
   remarks: string;
 };
 
-export type Employee = Person & { retire: string | null };
+export type Employee = Person & { retire: string | null; out?: boolean };
 
 export type Post = { code: string; label: string; count: number };
 
 /** Cadre strength above AE, top post first. Everyone below these is an AE. */
 export const DEFAULT_POSTS: Post[] = [
   { code: "BM", label: "Board Member", count: 4 },
-  { code: "CE", label: "Chief Engineer", count: 16 },
-  { code: "DCE", label: "Deputy Chief Engineer", count: 75 },
-  { code: "EE", label: "Executive Engineer", count: 240 },
-  { code: "AEE", label: "Asst. Executive Engineer", count: 741 },
+  { code: "CE", label: "Chief Engineer", count: 14 },
+  { code: "DCE", label: "Deputy Chief Engineer", count: 68 },
+  { code: "EE", label: "Executive Engineer", count: 220 },
+  { code: "AEE", label: "Asst. Executive Engineer", count: 679 },
 ];
 export const AE_LABEL = "Assistant Engineer";
 export const DEFAULT_RETIREMENT_AGE = 56;
@@ -69,11 +69,12 @@ export function employees(people: Person[], retirementAge: number): Employee[] {
 }
 
 /**
- * Counted on the list on `date` until they retire. Joining dates are ignored:
- * list order is the seniority order. Unknown DOB is left out.
+ * Counted on the list on `date` until they retire, unless marked not in
+ * service. Joining dates are ignored: list order is the seniority order.
+ * Unknown DOB is left out.
  */
 export function isActive(e: Employee, date: string): boolean {
-  return !!e.retire && e.retire >= date;
+  return !!e.retire && e.retire >= date && !e.out;
 }
 
 /** Index into posts for a 1-based seniority rank; posts.length means AE. */

@@ -15,8 +15,8 @@ test("rank maps to post by cumulative cadre strength", () => {
   assert.equal(postIndexForRank(1, DEFAULT_POSTS), 0);
   assert.equal(postIndexForRank(4, DEFAULT_POSTS), 0);
   assert.equal(postIndexForRank(5, DEFAULT_POSTS), 1);
-  assert.equal(postIndexForRank(4 + 16 + 75 + 240 + 741, DEFAULT_POSTS), 4);
-  assert.equal(postIndexForRank(4 + 16 + 75 + 240 + 741 + 1, DEFAULT_POSTS), 5);
+  assert.equal(postIndexForRank(4 + 14 + 68 + 220 + 679, DEFAULT_POSTS), 4);
+  assert.equal(postIndexForRank(4 + 14 + 68 + 220 + 679 + 1, DEFAULT_POSTS), 5);
 });
 
 test("snapshot ranks only people in service, in list order", () => {
@@ -47,4 +47,14 @@ test("timeline is contiguous, never demotes, and ends at retirement", () => {
       assert.equal(row?.post, s.post);
     }
   }
+});
+
+test("someone marked not in service is left out of the count", () => {
+  const all = employees(people, 56);
+  const before = snapshot(all, "2026-10-29", DEFAULT_POSTS);
+  const first = before[0];
+  const changed = all.map((e) => (e.slno === first.slno ? { ...e, out: true } : e));
+  const after = snapshot(changed, "2026-10-29", DEFAULT_POSTS);
+  assert.ok(!after.some((r) => r.slno === first.slno));
+  assert.equal(after.length, before.length - 1);
 });
