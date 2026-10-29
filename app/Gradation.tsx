@@ -11,13 +11,13 @@ import {
   snapshot,
   timeline,
   today,
+  type Person,
   type Post,
 } from "@/lib/gradation";
-import people from "@/data/ae.json";
 
 type Tab = "date" | "person";
 
-export default function Gradation() {
+export default function Gradation({ people }: { people: Person[] }) {
   const [tab, setTab] = useState<Tab>("date");
   const [selected, setSelected] = useState<number | null>(null);
   const openPerson = (slno: number) => {
@@ -27,7 +27,7 @@ export default function Gradation() {
   };
   const [posts, setPosts] = useState<Post[]>(DEFAULT_POSTS);
   const [age, setAge] = useState(DEFAULT_RETIREMENT_AGE);
-  const all = useMemo(() => employees(people, age), [age]);
+  const all = useMemo(() => employees(people, age), [people, age]);
 
   return (
     <>

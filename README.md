@@ -29,6 +29,13 @@ npm run build
 
 The original PHP app is kept in `legacy-php/` for reference.
 
-## Password
 
-Set the `SITE_PASSWORD` environment variable in Vercel to put the whole site behind a shared password (any username works). Leave it unset for an open site.
+## Google login
+
+The site asks visitors to sign in with Google once these environment variables are set (in Vercel, or `.env.local` for local work):
+
+- `AUTH_SECRET`: a random string (`npx auth secret` makes one)
+- `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`: from a Google Cloud OAuth client (type "Web application") with redirect URI `https://<your-domain>/api/auth/callback/google`
+- `ALLOWED_EMAILS` (optional): comma-separated emails allowed in. Leave it empty to let any Google account in.
+
+Without `AUTH_GOOGLE_ID` the site is open.

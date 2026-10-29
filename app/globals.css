@@ -105,3 +105,10 @@ tr.clickable:hover td { background: color-mix(in srgb, var(--accent) 6%, transpa
 .results .muted { font-size: 13px; margin-left: 6px; }
 .who { font-size: 18px; margin: 16px 0 0; }
 .card > .row:first-child { margin-bottom: 12px; }
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.topbar form { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.signin { max-width: 420px; padding-top: 12vh; }
+.signin h1 { margin: 0 0 6px; font-size: 22px; }
+.signin form { margin-top: 18px; }
+button.google { width: 100%; padding: 10px 14px; font-weight: 600; background: var(--accent); border-color: var(--accent); color: #fff; }
+.error { color: var(--p0); }
