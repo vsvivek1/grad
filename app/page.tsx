@@ -37,6 +37,10 @@ export default async function Page() {
           )}
         </div>
         <p>Who holds which post on a given date, and each engineer&apos;s projected career.</p>
+        <p className="notice">
+          <strong>Disclaimer:</strong> an approximation only, based on the available PSC advice. Not an official order or ranking.
+          Confirm decisions with official KSEB and PSC records.
+        </p>
       </header>
       {/* The list is passed from the server so it only reaches signed-in visitors, not a public JS file. */}
       <Gradation
